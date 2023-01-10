@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item
+    android:id="@+id/profileChange"
+    android:title="Change Profile"
+    android:icon="@drawable/ic_settting"
+    />
+<item
+    android:id="@+id/logOut"
+    android:title="LOG OUT"
+    android:icon="@drawable/ic_logout"
+    />
+
+</menu>
