@@ -8,8 +8,8 @@ View message history
 Profile picture feature allowing users to set their own display picture
 
 # Getting Started
-Create an account or log in if you already have one
-Start sending messages to your contacts and personalize your experience by setting your own display picture
+Create an account or log in if you already have one.\n
+Start sending messages to App's users and personalize your experience by setting your own display picture.
 # Technical details
 The app is built using Kotlin and Firebase
 Firebase Realtime Database is used for message storage and retrieval
