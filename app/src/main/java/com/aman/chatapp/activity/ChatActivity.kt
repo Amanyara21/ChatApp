@@ -1,11 +1,6 @@
 package com.aman.chatapp.activity
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -13,22 +8,22 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBar
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.aman.chatapp.models.Message
-import com.aman.chatapp.adapter.MessageAdaptar
+import com.aman.chatapp.BuildConfig
 import com.aman.chatapp.R
+import com.aman.chatapp.adapter.MessageAdaptar
+import com.aman.chatapp.models.Message
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import org.json.JSONObject
+import java.io.InputStream
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+
 //
 //
 class ChatActivity : AppCompatActivity() {
@@ -45,6 +40,8 @@ class ChatActivity : AppCompatActivity() {
 
     private lateinit var videoCallButton:ImageView
     private lateinit var audioCallButton:ImageView
+    private lateinit var apiKey:String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +62,13 @@ class ChatActivity : AppCompatActivity() {
         audioCallButton.setOnClickListener {
 //            sendCallRequest("audio")
         }
+
+
+        val properties = Properties()
+        val inputStream: InputStream = assets.open("local.properties")
+        properties.load(inputStream)
+
+        apiKey = properties.getProperty("api_key")
     }
 
 
@@ -226,7 +230,7 @@ class ChatActivity : AppCompatActivity() {
     // Function to send the FCM request
     private fun sendFCMRequest(json: JSONObject) {
         try {
-            val serverKey = "AAAAdlqTe9U:APA91bHi7JfcxN7I_ohqNjPc_2wfvbZAEPwjyg_ZaWGg0AcRpbb5D0EJOR4LOkBFKNFbv-5iNsUAbMj2I2HAjsTjjJYBNl1gK2RO8VLSPqZpu7pqjri_U-T9jkMkvNBhW7wiHfLmCRvw"
+            val serverKey = "$apiKey"
             val fcmEndpoint = "https://fcm.googleapis.com/fcm/send"
 
             val request = object :
