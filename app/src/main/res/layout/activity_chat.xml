@@ -1,46 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Chat">
+    tools:context=".activity.ChatActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/Chatrecycler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        />
+        android:layout_height="match_parent"
+        android:layout_above="@id/sendlayout"
+        android:paddingBottom="8dp" />
 
     <LinearLayout
         android:id="@+id/sendlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:weightSum="100">
+        android:background="#F5F5F5"
+        android:elevation="4dp"
+        android:orientation="horizontal"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
+
         <EditText
             android:id="@+id/Editmsg"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_weight="80"
-            android:maxWidth="160dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:paddingStart="20dp"
-            android:background="@drawable/msg_box"
-            android:hint="Type a message"
-            />
-        <ImageView
-            android:id="@+id/sentbtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="20"
-            android:minWidth="60dp"
-            android:src="@drawable/sendbtn"
-            />
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/msg_box"
+            android:hint="Type a message"
+            android:maxWidth="160dp"
+            android:paddingStart="16dp"
+            android:padding="8dp" />
 
+        <ImageView
+            android:id="@+id/sentbtn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Send"
+            android:src="@drawable/sendbtn" />
     </LinearLayout>
 </RelativeLayout>

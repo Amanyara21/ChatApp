@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".signup"
-    android:background="#ffffff">
+    tools:context=".activity.SignupActivity"
+    android:background="@color/light_blue">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:layout_marginTop="20dp"
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:src="@drawable/ic_profile"
-        app:civ_border_color="#FF000000"
+        app:civ_border_color="@color/green"
         app:civ_border_width="2dp" />
 
     <LinearLayout
@@ -33,9 +33,9 @@
             android:layout_margin="15sp"
             android:hint="Enter Name"
             android:paddingEnd="15dp"
-            android:textColor="@color/black"
+            android:textColor="@android:color/black"
+            android:textColorHint="@android:color/black" />
 
-            android:textColorHint="@color/black" />
         <EditText
             android:id="@+id/Editmail"
             android:layout_width="match_parent"
@@ -45,9 +45,9 @@
             android:layout_margin="15sp"
             android:hint="@string/LoginHINT"
             android:paddingEnd="15dp"
-            android:textColor="@color/black"
+            android:textColor="@android:color/black"
+            android:textColorHint="@android:color/black" />
 
-            android:textColorHint="@color/black" />
         <EditText
             android:id="@+id/Editpass"
             android:layout_width="match_parent"
@@ -58,13 +58,10 @@
             android:hint="Enter Password"
             android:inputType="textPassword"
             android:paddingEnd="15dp"
-            android:textColor="@color/black"
-
-            android:textColorHint="@color/black" />
-
-
-
+            android:textColor="@android:color/black"
+            android:textColorHint="@android:color/black" />
     </LinearLayout>
+
     <Button
         android:id="@+id/btnSign"
         android:layout_width="match_parent"
@@ -75,7 +72,8 @@
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="12dp"
         android:textSize="18sp"
-        android:text="SignUP" />
-
+        android:text="Sign Up"
+        android:background="@drawable/button_background"
+        android:textColor="@android:color/white" />
 
 </RelativeLayout>

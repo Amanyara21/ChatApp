@@ -1,4 +1,4 @@
-package com.aman.chatapp
+package com.aman.chatapp.models
 
 class Message {
     var message : String ? = null

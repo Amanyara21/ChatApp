@@ -1,4 +1,4 @@
-package com.aman.chatapp
+package com.aman.chatapp.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -6,11 +6,10 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
+import com.aman.chatapp.R
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import de.hdodenhof.circleimageview.CircleImageView
-import java.util.jar.Attributes
 
 class ChangeProfilePic : AppCompatActivity() {
     lateinit var image : CircleImageView
@@ -34,6 +33,7 @@ class ChangeProfilePic : AppCompatActivity() {
     private fun uploadToFirebase(imageUri : Uri, email: String?) {
         val uploadTask = StrgRef.child("images/${email}").putFile(imageUri)
     }
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == gallery_request){

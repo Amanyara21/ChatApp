@@ -1,4 +1,4 @@
-package com.aman.chatapp
+package com.aman.chatapp.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.aman.chatapp.models.Message
+import com.aman.chatapp.R
 import com.google.firebase.auth.FirebaseAuth
 
 class MessageAdaptar(val context : Context, val MessageList : ArrayList<Message>):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -27,15 +29,13 @@ class MessageAdaptar(val context : Context, val MessageList : ArrayList<Message>
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val currentMessage = MessageList[position]
-        if(holder.javaClass == sentViewHolder::class.java){
 
+        if (holder.javaClass == sentViewHolder::class.java) {
             val viewHolder = holder as sentViewHolder
-
-            holder.sentMessage.text = currentMessage.message
-        }
-        else{
+            viewHolder.sentMessage.text = currentMessage.message
+        } else {
             val viewHolder = holder as receiveViewHolder
-            holder.receiveMessage.text = currentMessage.message
+            viewHolder.receiveMessage.text = currentMessage.message
         }
     }
 

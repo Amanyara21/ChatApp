@@ -1,25 +1,21 @@
-package com.aman.chatapp
+package com.aman.chatapp.adapter
 
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
+import com.aman.chatapp.activity.ChatActivity
+import com.aman.chatapp.R
+import com.aman.chatapp.models.user
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
-import com.google.firebase.database.*
-import com.google.firebase.storage.StorageReference
 import de.hdodenhof.circleimageview.CircleImageView
 import java.io.File
 
-class Adaptar(val context: Context, val userList : ArrayList<user>) : RecyclerView.Adapter<Adaptar.userViewHolder>() {
+class Adaptar(val context: Context, val userList: ArrayList<user>) : RecyclerView.Adapter<Adaptar.userViewHolder>() {
 
 
 
@@ -31,6 +27,7 @@ class Adaptar(val context: Context, val userList : ArrayList<user>) : RecyclerVi
     override fun onBindViewHolder(holder: userViewHolder, position: Int) {
         val currentUser = userList[position]
         holder.textName.text = currentUser.name
+        println("user is "+currentUser.name)
         val storageReference = FirebaseStorage.getInstance().getReference().child("images/${currentUser.email}" )
 
         val localFile = File.createTempFile("tempImage", "jpg")
@@ -44,7 +41,7 @@ class Adaptar(val context: Context, val userList : ArrayList<user>) : RecyclerVi
 //        }
         holder.itemView.setOnClickListener{
 
-                val intent = Intent(context, Chat::class.java)
+                val intent = Intent(context, ChatActivity::class.java)
                 intent.putExtra("name", currentUser.name)
                 intent.putExtra("uid", currentUser.uid)
                 intent.putExtra("email", currentUser.email)

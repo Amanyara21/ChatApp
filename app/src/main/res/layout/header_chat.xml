@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/button_start"
+    android:padding="8dp"
+    app:layout_scrollEffect="compress">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/customImageView"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/ic_profile"
+        app:cardPreventCornerOverlap="true"
+        app:civ_border_color="#808080"
+        app:civ_border_width="1dp" />
+
+    <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/customImageView"
+        android:fontWeight="700"
+        android:text="Name"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        app:emojiCompatEnabled="true"
+        app:fontFamily="serif"
+        tools:targetApi="o" />
+    
+<!--    <ImageView-->
+<!--        android:id="@+id/icon1"-->
+<!--        android:layout_width="24dp"-->
+<!--        android:layout_height="24dp"-->
+<!--        android:layout_centerVertical="true"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_marginEnd="15dp"-->
+<!--        android:src="@drawable/ic_more" />-->
+
+    <ImageView
+        android:id="@+id/icon2"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
+        android:src="@drawable/ic_call" />
+
+        <ImageView
+            android:id="@+id/icon3"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/icon2"
+            android:layout_marginEnd="30dp"
+            android:src="@drawable/ic_video_call" />
+    </RelativeLayout>

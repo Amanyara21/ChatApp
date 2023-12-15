@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+
+app/src/main/java/com/aman/chatapp/classes/WebRTCManager.kt
+app/src/main/java/com/aman/chatapp/activity/VideoCallActivity.kt
+app/src/main/java/com/aman/chatapp/activity/AudioCallActivity.kt
+
+app/src/main/res/layout/activity_audio_call.xml
+app/src/main/res/layout/activity_video_call.xml
+
