@@ -1,0 +1,30 @@
+<!-- res/layout/custom_notification_layout.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/notificationIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_notifications"/>
+
+    <TextView
+        android:id="@+id/notificationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Call from user"/>
+
+    <Button
+        android:id="@+id/acceptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accept"/>
+
+    <Button
+        android:id="@+id/rejectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reject"/>
+</LinearLayout>

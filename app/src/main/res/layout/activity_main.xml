@@ -10,7 +10,7 @@
         android:id="@+id/userView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="39dp"
-        tools:layout_editor_absoluteY="171dp"
+        tools:layout_editor_absoluteX="-82dp"
+        tools:layout_editor_absoluteY="0dp"
         tools:listitem="@layout/user_recycler" />
 </androidx.constraintlayout.widget.ConstraintLayout>

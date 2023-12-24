@@ -1,6 +1,7 @@
 package com.aman.chatapp.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,7 +12,6 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.aman.chatapp.BuildConfig
 import com.aman.chatapp.R
 import com.aman.chatapp.adapter.MessageAdaptar
 import com.aman.chatapp.models.Message
@@ -21,11 +21,10 @@ import com.android.volley.toolbox.Volley
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import org.json.JSONObject
-import java.io.InputStream
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
-//
-//
 class ChatActivity : AppCompatActivity() {
     private lateinit var chatRecyclerView: RecyclerView
     private lateinit var messageBox: EditText
@@ -35,12 +34,13 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var dbRef: DatabaseReference
     private var senderRoom: String? = null
     private var receiverRoom: String? = null
-    private var receiverUid:String?=null
-    private var senderUid:String?=null
+    private var receiverUid: String? = null
+    private var senderUid: String? = null
 
-    private lateinit var videoCallButton:ImageView
-    private lateinit var audioCallButton:ImageView
-    private lateinit var apiKey:String
+    private lateinit var videoCallButton: ImageView
+    private lateinit var audioCallButton: ImageView
+    private lateinit var apiKey: String
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,23 +53,56 @@ class ChatActivity : AppCompatActivity() {
         setupRecyclerView()
 
         sentBtn.setOnClickListener {
-                sendMessage()
+            sendMessage()
         }
-        videoCallButton.setOnClickListener {
-//            sendCallRequest("video")
-        }
-
         audioCallButton.setOnClickListener {
-//            sendCallRequest("audio")
+            println("Clicked Audio Call Button")
+            val callId =UUID.randomUUID().toString()
+            senderUid?.let { it1 -> receiverUid?.let { it2 ->
+                updateCallStatus(callId, it1, it2, "initiated")
+            } }
+            sendIntent(senderUid, receiverUid, callId,"sender", AudioCallActivity::class.java)
+            sendFCMNotification(receiverUid, senderUid, "", true, callId , "audioCall")
+        }
+
+        videoCallButton.setOnClickListener {
+            val callId =UUID.randomUUID().toString()
+            sendFCMNotification(receiverUid, senderUid, "", true, callId , "videoCall")
+
+            sendIntent(senderUid, receiverUid, callId,"sender", VideoCallActivity::class.java)
+
         }
 
 
-        val properties = Properties()
-        val inputStream: InputStream = assets.open("local.properties")
-        properties.load(inputStream)
+//        val properties = Properties()
+//        val inputStream: InputStream = assets.open("local.properties")
+//        properties.load(inputStream)
 
-        apiKey = properties.getProperty("api_key")
+//        apiKey = properties.getProperty("api_key")
+         }
+
+    private fun sendIntent(
+        senderUid: String?,
+        receiverUid: String?,
+        callId: String,
+        s: String,
+        java: Class<*>,) {
+        val intent: Intent = Intent(this, java)
+        intent.putExtra("senderUid", senderUid)
+        intent.putExtra("receiverUid", receiverUid)
+        intent.putExtra("callId", callId)
+        intent.putExtra("user", s)
+        startActivity(intent)
+
     }
+
+    fun updateCallStatus(callId: String, senderUid: String, receiverUid: String, status: String) {
+        val callRef = FirebaseDatabase.getInstance().getReference("calls").child(callId)
+        callRef.child("status").setValue(status)
+        callRef.child("participants").child(senderUid).setValue(true)
+        callRef.child("participants").child(receiverUid).setValue(true)
+    }
+
 
 
     private fun initializeViews() {
@@ -86,8 +119,8 @@ class ChatActivity : AppCompatActivity() {
             setDisplayShowCustomEnabled(true)
             setCustomView(R.layout.header_chat)
             val customImageView: ImageView = customView.findViewById(R.id.customImageView)
-            videoCallButton = customView.findViewById(R.id.icon2)
-            audioCallButton= customView.findViewById(R.id.icon3)
+            audioCallButton = customView.findViewById(R.id.icon2)
+            videoCallButton = customView.findViewById(R.id.icon3)
             val customName: TextView? = customView.findViewById(R.id.nameTextView)
             customName?.text = intent.getStringExtra("name")
         }
@@ -118,7 +151,6 @@ class ChatActivity : AppCompatActivity() {
                     }
                     messageList.reverse()
                     messageAdapter.notifyDataSetChanged()
-//                    scrollToBottom()
                 }
 
 
@@ -138,7 +170,7 @@ class ChatActivity : AppCompatActivity() {
                     dbRef.child("chat").child(receiverRoom!!).child("messages").push()
                         .setValue(messageObject)
                         .addOnSuccessListener {
-                            sendFCMNotification(receiverUid, senderUid, messageText, false,"")
+                            sendFCMNotification(receiverUid, senderUid, messageText, false, "",null)
                         }
                 }
             messageBox.setText("")
@@ -146,49 +178,63 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
-
-    private fun sendFCMNotification(receiverUid: String?, senderUid: String?, content: String, isCall: Boolean, callId: String?) {
+    private fun sendFCMNotification(
+        receiverUid: String?,
+        senderUid: String?,
+        content: String,
+        isCall: Boolean,
+        callId: String?,
+        type:String?
+    ) {
         if (receiverUid != null && senderUid != null) {
             dbRef.child("user").child(receiverUid).child("fcmToken")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         val receiverToken = dataSnapshot.getValue(String::class.java)
 
-                        if (receiverToken != null) {
-                            var title: String
-                            var body: String
+                        dbRef.child("user").child(senderUid).child("name")
+                            .addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(senderDataSnapshot: DataSnapshot) {
 
-                            if (isCall) {
-                                title = "Incoming Call"
-                                body = "You have an incoming call from $senderUid"
+                                    if (receiverToken != null) {
+                                        var title: String
+                                        var body: String
 
-                                if (callId != null) {
-                                    val notificationData = JSONObject().apply {
-                                        put("senderUid", senderUid)
-                                        put("callType", "incomingCall")
-                                        put("callId", callId)
-                                    }
+                                        if (isCall) {
+                                            title = "Incoming Call"
+                                            body = "You have an incoming call from $senderUid"
 
-                                    // Modify the FCM request to include data payload
-                                    println("Hello I am sending data")
-                                    val json = JSONObject().apply {
-                                        put("to", receiverToken)
-                                        put("notification", JSONObject().apply {
-                                            put("title", title)
-                                            put("body", body)
-                                        })
-                                        put("data",notificationData)
-                                    }
+                                            if (callId != null) {
 
-                                    sendFCMRequest(json)
-                                }
-                            } else {
-                                // Handle message notification
-                                // Get sender's name
-                                dbRef.child("user").child(senderUid).child("name")
-                                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                                        override fun onDataChange(senderDataSnapshot: DataSnapshot) {
-                                            val senderName = senderDataSnapshot.getValue(String::class.java)
+                                                val notificationData = JSONObject().apply {
+                                                    put("title", title)
+                                                    put("body", body)
+                                                    put("senderUid", senderUid)
+                                                    put("receiverUid", receiverUid)
+                                                    put("callType", "incomingCall")
+                                                    put("callId", callId)
+                                                    put("type", type)
+                                                }
+
+                                                // Modify the FCM request to include data payload
+                                                println("Hello I am sending data")
+                                                val json = JSONObject().apply {
+                                                    put("to", receiverToken)
+//                                                    put("notification", JSONObject().apply {
+//                                                        put("title", title)
+//                                                        put("body", body)
+//                                                    })
+                                                    put("data", notificationData)
+                                                }
+
+                                                sendFCMRequest(json)
+                                            }
+                                        } else {
+                                            // Handle message notification
+                                            // Get sender's name
+
+                                            val senderName =
+                                                senderDataSnapshot.getValue(String::class.java)
                                             if (senderName != null) {
                                                 title = "New Message from $senderName"
                                                 body = content
@@ -196,11 +242,13 @@ class ChatActivity : AppCompatActivity() {
                                                 // Modify the FCM request for message notification
                                                 val json = JSONObject().apply {
                                                     put("to", receiverToken)
-                                                    put("notification", JSONObject().apply {
+//                                                    put("notification", JSONObject().apply {
+//                                                        put("title", title)
+//                                                        put("body", body)
+//                                                    })
+                                                    put("data", JSONObject().apply {
                                                         put("title", title)
                                                         put("body", body)
-                                                    })
-                                                    put("data", JSONObject().apply {
                                                         put("senderUid", senderUid)
                                                         put("senderName", senderName)
                                                     })
@@ -209,17 +257,13 @@ class ChatActivity : AppCompatActivity() {
                                                 sendFCMRequest(json)
                                             }
                                         }
-
-                                        override fun onCancelled(senderError: DatabaseError) {
-                                            println("Error retrieving sender name: ${senderError.message}")
-                                        }
-                                    })
-                            }
-                        } else {
-                            println("Failed to retrieve receiver token")
-                        }
+                                    }
+                                }
+                                override fun onCancelled(senderError: DatabaseError) {
+                                    println("Error retrieving sender name: ${senderError.message}")
+                                }
+                            })
                     }
-
                     override fun onCancelled(receiverError: DatabaseError) {
                         println("Error retrieving receiver token: ${receiverError.message}")
                     }
@@ -230,7 +274,7 @@ class ChatActivity : AppCompatActivity() {
     // Function to send the FCM request
     private fun sendFCMRequest(json: JSONObject) {
         try {
-            val serverKey = "$apiKey"
+            val serverKey = apiKey
             val fcmEndpoint = "https://fcm.googleapis.com/fcm/send"
 
             val request = object :
@@ -272,17 +316,7 @@ class ChatActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
-
-
-
-
-
-
-
 }
-
-
-
 
 
 //import androidx.appcompat.app.ActionBar

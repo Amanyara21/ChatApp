@@ -3,22 +3,29 @@ package com.aman.chatapp.activity
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.aman.chatapp.adapter.Adaptar
 import com.aman.chatapp.R
+import com.aman.chatapp.adapter.Adaptar
 import com.aman.chatapp.classes.PermissionHandler
 import com.aman.chatapp.models.user
+import com.android.volley.RequestQueue
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.StorageReference
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var userView: RecyclerView
@@ -29,9 +36,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var permissionHandler: PermissionHandler
 
+    private lateinit var requestQueue: RequestQueue
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         dbRef = FirebaseDatabase.getInstance().reference
         auth = FirebaseAuth.getInstance()
@@ -71,9 +81,11 @@ class MainActivity : AppCompatActivity() {
         if (!permissionHandler.checkCameraPermission()) {
             permissionHandler.requestCameraPermission()
         }
+}
 
 
-    }
+
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -144,7 +156,9 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.profileChange -> {
-                startActivity(Intent(this@MainActivity, ChangeProfilePic::class.java))
+//                startActivity(Intent(this@MainActivity, ChangeProfilePic::class.java))
+                startActivity(Intent(this@MainActivity, VideoCallActivity::class.java))
+
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
