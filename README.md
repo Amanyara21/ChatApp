@@ -16,3 +16,20 @@ The app is built using Kotlin and Firebase\
 Firebase Realtime Database is used for message storage and retrieval\
 Firebase Storage is used for storing user's profile picture
 
+
+### 1. Login Screen
+![Login Screen](images/IMG-20240530-WA0014.jpg)
+
+### 2. Verify Email Screen
+![Verify Email Screen](images/IMG-20240530-WA0013.jpg)
+
+### 3. Main Screen
+![Main Screen](images/IMG-20240530-WA0015.jpg)
+
+### 4. Chat Screen
+![Chat Screen](images/IMG-20240530-WA0016.jpg)
+
+### 5. Video Call Screen
+![Video Call Screen](images/IMG-20240530-WA0017.jpg)
+
+
