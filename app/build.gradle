@@ -16,6 +16,23 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.withInputStream { stream ->
+                localProperties.load(stream)
+            }
+        }
+
+        def apiKey = localProperties['API_KEY']
+        if (apiKey) {
+            buildConfigField "String", "API_KEY", "\"${apiKey}\""
+        } else {
+            throw new GradleException("API_KEY not found in local.properties")
+        }
+
+
     }
 
     buildTypes {
@@ -23,6 +40,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -31,6 +49,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        buildConfig true
+    }
+
     buildToolsVersion '30.0.3'
 }
 

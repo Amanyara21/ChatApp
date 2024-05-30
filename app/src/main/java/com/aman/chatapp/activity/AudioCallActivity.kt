@@ -1,121 +1,113 @@
 package com.aman.chatapp.activity
 
-import android.app.NotificationManager
-import android.media.AudioFormat
-import android.media.AudioManager
-import android.media.AudioTrack
 import android.os.Bundle
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.annotation.OptIn
+import android.view.View
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.aman.chatapp.R
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.aman.chatapp.classes.WebRTCHelper
+import com.aman.chatapp.utils.DataModelType
+import com.google.firebase.auth.FirebaseAuth
+import org.webrtc.SurfaceViewRenderer
 
 
+class AudioCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
 
-class AudioCallActivity : AppCompatActivity() {
+    private lateinit var webRTCHelper: WebRTCHelper
+    private var isMicrophoneMuted = false
+    private lateinit var localView: SurfaceViewRenderer
+    private lateinit var remoteView: SurfaceViewRenderer
+    private lateinit var callLayout: RelativeLayout
+    private lateinit var micButton: ImageView
+    private lateinit var endCallButton: ImageView
 
-
-    private lateinit var tvCallStatus: TextView
-    private lateinit var btnToggleAudio: ImageButton
-    private lateinit var btnEndCall: ImageButton
-
+    private lateinit var receiverUid:String
+    private lateinit var senderUid:String
+    private lateinit var currentUserName:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_call)
 
-        val senderUid = intent.getStringExtra("senderUid")
-        val reciverUid = intent.getStringExtra("receiverUid")
-        val callId = intent.getStringExtra("callId")
-        val notificationId = intent.getIntExtra("notificationId",0)
-        val user = intent.getStringExtra("user")
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val currentUser = firebaseAuth.currentUser
+        currentUserName= currentUser?.uid.toString()
 
-        if(user != "reciever" ){
-            updateCallStatus(callId,senderUid,reciverUid,"accepted")
+
+        initializeViews()
+        webRTCHelper.login(currentUserName, applicationContext) { }
+        init()
+
+    }
+    private fun initializeViews() {
+        callLayout = findViewById(R.id.callLayout)
+        remoteView = findViewById(R.id.remote_view)
+        localView = findViewById(R.id.local_view)
+        micButton = findViewById(R.id.mic_button)
+        endCallButton = findViewById(R.id.end_call_button)
+        webRTCHelper = WebRTCHelper.getInstance()
+
+        callLayout.visibility = View.VISIBLE
+
+
+        senderUid = intent.getStringExtra("senderUid").toString()
+        receiverUid = intent.getStringExtra("receiverUid").toString()
+    }
+
+    private fun init() {
+
+        if(senderUid==currentUserName){
+            webRTCHelper.sendCallRequest(receiverUid) { }
+            webRTCHelper.initLocalView(localView)
+            webRTCHelper.initRemoteView(remoteView)
         }
 
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(notificationId)
+        webRTCHelper.listener = this
 
-        val callRef = FirebaseDatabase.getInstance().getReference("calls").child(callId.toString())
-
-        callRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val callData = snapshot.getValue(CallData::class.java)
-                    callData?.let {
-                        val status = it.status
-                        // Check the call status and initiate the call if accepted
-                        if (status == "accepted") {
-                            // Initiate the call
-                            initiateCall()
-                        } else if (status == "rejected") {
-                            // Handle the case when the call is rejected
-                            finish()
-                        }
-                        // Add more cases as needed
+        webRTCHelper.subscribeForLatestEvent { model ->
+            runOnUiThread {
+                if (model.type == DataModelType.StartCall) {
+                    if(receiverUid==currentUserName){
+                        webRTCHelper.initLocalView(localView)
+                        webRTCHelper.initRemoteView(remoteView)
+                        webRTCHelper.startCall(model.sender)
                     }
                 }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error if needed
-            }
-        })
-
-
-
-        // Initialize UI components
-        tvCallStatus = findViewById(R.id.tvCallStatus)
-        btnToggleAudio = findViewById(R.id.btnToggleAudio)
-        btnEndCall = findViewById(R.id.btnEndCall)
-
-        // Set up your WebRTC manager to handle audio call logic
-//        val webRTCManager= WebRTCManager(this)
-        // Set click listeners for call controls
-        btnToggleAudio.setOnClickListener {
-            // Toggle audio mute/unmute
-//             webRTCManager.toggleAudio()
         }
 
-        btnEndCall.setOnClickListener {
-            // End the call
-//             webRTCManager.endCall()
+        micButton.setOnClickListener {
+            if (isMicrophoneMuted) {
+                micButton.setImageResource(R.drawable.ic_mic_off)
+            } else {
+                micButton.setImageResource(R.drawable.ic_baseline_mic_24)
+            }
+            webRTCHelper.toggleAudio(isMicrophoneMuted)
+            isMicrophoneMuted = !isMicrophoneMuted
+        }
+
+        endCallButton.setOnClickListener {
+            webRTCHelper.endCall()
             finish()
         }
     }
+    override fun webrtcConnected() {
+        runOnUiThread {
 
-
-    private fun updateCallStatus(callId: String?, senderUid: String?, receiverUid: String?, status: String) {
-        val callRef = FirebaseDatabase.getInstance().getReference("calls").child(callId.toString())
-        callRef.child("status").setValue(status)
-        if (senderUid != null) {
-            callRef.child("participants").child(senderUid).setValue(true)
-        }
-        if (receiverUid != null) {
-            callRef.child("participants").child(receiverUid).setValue(true)
         }
     }
-    private fun initiateCall() {
-        // Initialize your WebRTC manager to handle audio call logic
-//        val webRTCManager = WebRTCManager(this)
+    override fun webrtcConnecting() {
+        runOnUiThread {
 
-        // Set up the remote renderer for audio-only call
-
-        // Start the call
-//        webRTCManager.startAudioCall()
+        }
     }
 
-
-
+    override fun webrtcClosed() {
+        runOnUiThread {
+            webRTCHelper.endCall()
+            finish()
+        }
+    }
 }
 
-data class CallData(
-    val participants: Map<String, Boolean>? = null,
-    val status: String? = null
-)
 

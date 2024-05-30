@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.RingtoneManager
 import android.os.Build
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.aman.chatapp.activity.ChatActivity
 import com.aman.chatapp.R
@@ -128,16 +129,23 @@ class NotificationService : FirebaseMessagingService() {
 
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
 
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Incoming Call from $senderName")
-            .setContentText("You have an incoming call")
+
+
+        val contentView = RemoteViews(packageName, R.layout.call_notification)
+        contentView.setTextViewText(R.id.notificationText, "Call from ${data["senderName"]}")
+
+
+        val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notifications)
+            .setCustomContentView(contentView)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .addAction(R.drawable.ic_call, "Accept", acceptPendingIntent)
             .addAction(R.drawable.ic_baseline_call_end_24, "Reject", rejectPendingIntent)
             .setSound(ringtoneUri)
+            .setOngoing(true)
+            .build()
 
-        notificationManager.notify(notificationId, notificationBuilder.build())
+        notificationManager.notify(notificationId, notification)
     }
 
 

@@ -1,6 +1,7 @@
 package com.aman.chatapp.activity
 
 
+import android.content.Intent
 import com.aman.chatapp.R
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import android.widget.*
 import com.aman.chatapp.classes.WebRTCHelper
 import com.aman.chatapp.utils.*
 import com.google.firebase.auth.FirebaseAuth
+import de.hdodenhof.circleimageview.CircleImageView
 import org.webrtc.SurfaceViewRenderer
 
 class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
@@ -22,13 +24,13 @@ class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
     private var isMicrophoneMuted = false
     private lateinit var localView:SurfaceViewRenderer
     private lateinit var remoteView:SurfaceViewRenderer
-    private lateinit var incomingCallLayout: LinearLayout
     private lateinit var callLayout: RelativeLayout
     private lateinit var micButton: ImageView
     private lateinit var videoButton: ImageView
     private lateinit var endCallButton: ImageView
     private lateinit var switchCameraButton: ImageView
-
+    private lateinit var userImage: CircleImageView
+    private lateinit var userName: TextView
     private lateinit var receiverUid:String
     private lateinit var senderUid:String
     private lateinit var currentUserName:String
@@ -54,6 +56,8 @@ class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
         videoButton = findViewById(R.id.video_button)
         endCallButton = findViewById(R.id.end_call_button)
         switchCameraButton = findViewById(R.id.switch_camera_button)
+        userImage = findViewById(R.id.userImage)
+        userName = findViewById(R.id.userName)
         webRTCHelper = WebRTCHelper.getInstance()
 
         callLayout.visibility = View.VISIBLE
@@ -61,6 +65,13 @@ class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
 
         senderUid = intent.getStringExtra("senderUid").toString()
         receiverUid = intent.getStringExtra("receiverUid").toString()
+        userName.text = intent.getStringExtra("name")
+        val temp:Int = intent.getIntExtra("image", 0)
+        if(temp!=0) {
+            userImage.setImageResource(temp)
+        }else{
+            userImage.setImageResource(R.drawable.ic_profile)
+        }
     }
 
     private fun init() {
@@ -71,19 +82,19 @@ class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
             webRTCHelper.initRemoteView(remoteView)
     }
 
-            webRTCHelper.listener = this
+        webRTCHelper.listener = this
 
-            webRTCHelper.subscribeForLatestEvent { model ->
-                runOnUiThread {
-                    if (model.type == DataModelType.StartCall) {
-                        if(receiverUid==currentUserName){
-                            webRTCHelper.initLocalView(localView)
-                            webRTCHelper.initRemoteView(remoteView)
-                            webRTCHelper.startCall(model.sender)
-                        }
+        webRTCHelper.subscribeForLatestEvent { model ->
+            runOnUiThread {
+                if (model.type == DataModelType.StartCall) {
+                    if(receiverUid==currentUserName){
+                        webRTCHelper.initLocalView(localView)
+                        webRTCHelper.initRemoteView(remoteView)
+                        webRTCHelper.startCall(model.sender)
                     }
                 }
             }
+        }
 
 
 
@@ -93,7 +104,7 @@ class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
 
             micButton.setOnClickListener {
                 if (isMicrophoneMuted) {
-                    micButton.setImageResource(R.drawable.ic_baseline_mic_24)
+                    micButton.setImageResource(R.drawable.ic_mic_off)
                 } else {
                     micButton.setImageResource(R.drawable.ic_baseline_mic_24)
                 }
@@ -103,7 +114,7 @@ class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
 
             videoButton.setOnClickListener {
                 if (isCameraMuted) {
-                    videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
+                    videoButton.setImageResource(R.drawable.ic_video_cam_off)
                 } else {
                     videoButton.setImageResource(R.drawable.ic_baseline_videocam_24)
                 }
@@ -118,15 +129,18 @@ class VideoCallActivity : AppCompatActivity(), WebRTCHelper.Listener {
     }
     override fun webrtcConnected() {
         runOnUiThread {
-            val layoutParamsLocalView = localView.layoutParams
-            layoutParamsLocalView.width = 120 // Replace R.dimen.local_view_width with the actual dimension resource
-            layoutParamsLocalView.height = 120 // Replace R.dimen.local_view_height with the actual dimension resource
-            localView.layoutParams = layoutParamsLocalView
+            findViewById<RelativeLayout>(R.id.recieverData).visibility= View.GONE
+        }
+    }
+    override fun webrtcConnecting() {
+        runOnUiThread {
+            findViewById<RelativeLayout>(R.id.recieverData).visibility= View.GONE
         }
     }
 
     override fun webrtcClosed() {
         runOnUiThread {
+            webRTCHelper.endCall()
             finish()
         }
     }

@@ -1,5 +1,6 @@
 package com.aman.chatapp.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Intent
@@ -7,24 +8,17 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aman.chatapp.R
 import com.aman.chatapp.adapter.Adaptar
-import com.aman.chatapp.classes.PermissionHandler
+import com.aman.chatapp.classes.PermissionManager
 import com.aman.chatapp.models.user
-import com.android.volley.RequestQueue
-
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.storage.StorageReference
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,11 +26,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userList: ArrayList<user>
     private lateinit var adapter: Adaptar
     private lateinit var dbRef: DatabaseReference
-    private lateinit var storageRef: StorageReference
     private lateinit var auth: FirebaseAuth
-    private lateinit var permissionHandler: PermissionHandler
-
-    private lateinit var requestQueue: RequestQueue
+    private lateinit var permissionManager: PermissionManager
+    private val permissionsRequestCode = 123
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,51 +50,29 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        permissionHandler = PermissionHandler(this)
-        if (!permissionHandler.checkReadExternalStoragePermission()) {
-            permissionHandler.requestReadExternalStoragePermission()
-        }
-
-        if (!permissionHandler.checkInternetPermission()) {
-            permissionHandler.requestInternetPermission()
-        }
-        if (!permissionHandler.checkAccessNetworkStatePermission()) {
-            permissionHandler.requestAccessNetworkStatePermission()
-        }
-
-        if (!permissionHandler.checkRecordAudioPermission()) {
-            permissionHandler.requestRecordAudioPermission()
-        }
-
-        if (!permissionHandler.checkModifyAudioSettingsPermission()) {
-            permissionHandler.requestModifyAudioSettingsPermission()
-        }
-
-        if (!permissionHandler.checkCameraPermission()) {
-            permissionHandler.requestCameraPermission()
-        }
+        askPermission();
 }
-
-
-
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionHandler.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    private fun askPermission() {
+        val list = listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS
+        )
+        permissionManager = PermissionManager(this,list,permissionsRequestCode)
+        permissionManager.checkPermissions()
     }
+
+
+
 
     private fun setupUserListListener() {
         dbRef.child("user").addValueEventListener(object : ValueEventListener{
             @SuppressLint("NotifyDataSetChanged")
             override fun onDataChange(snapshot: DataSnapshot) {
                 userList.clear()
-                for (Snapshot in snapshot.children){
-                    val currentUser = Snapshot.getValue(user::class.java)
+                for (snapshot in snapshot.children){
+                    val currentUser = snapshot.getValue(user::class.java)
                     if (auth.currentUser?.uid != currentUser?.uid) {
                         userList.add(currentUser!!)
                     }
@@ -148,20 +118,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.logOut -> {
                 auth.signOut()
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 finish()
-                return true
+                true
             }
-            R.id.profileChange -> {
-//                startActivity(Intent(this@MainActivity, ChangeProfilePic::class.java))
-                startActivity(Intent(this@MainActivity, VideoCallActivity::class.java))
 
-                return true
+            R.id.profileChange -> {
+                startActivity(Intent(this@MainActivity, VideoCallActivity::class.java))
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

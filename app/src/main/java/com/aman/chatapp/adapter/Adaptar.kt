@@ -15,20 +15,20 @@ import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
 import java.io.File
 
-class Adaptar(val context: Context, val userList: ArrayList<user>) : RecyclerView.Adapter<Adaptar.userViewHolder>() {
+class Adaptar(val context: Context, val userList: ArrayList<user>) : RecyclerView.Adapter<Adaptar.UserViewHolder>() {
 
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): userViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val view : View = LayoutInflater.from(context).inflate(R.layout.user_recycler, parent , false)
-        return userViewHolder(view)
+        return UserViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: userViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val currentUser = userList[position]
         holder.textName.text = currentUser.name
         println("user is "+currentUser.name)
-        val storageReference = FirebaseStorage.getInstance().getReference().child("images/${currentUser.email}" )
+        val storageReference = FirebaseStorage.getInstance().reference.child("images/${currentUser.email}" )
 
         val localFile = File.createTempFile("tempImage", "jpg")
         storageReference.getFile(localFile).addOnSuccessListener {
@@ -45,6 +45,7 @@ class Adaptar(val context: Context, val userList: ArrayList<user>) : RecyclerVie
                 intent.putExtra("name", currentUser.name)
                 intent.putExtra("uid", currentUser.uid)
                 intent.putExtra("email", currentUser.email)
+                intent.putExtra("image", currentUser.image)
                 context.startActivity(intent)
         }
     }
@@ -52,9 +53,9 @@ class Adaptar(val context: Context, val userList: ArrayList<user>) : RecyclerVie
     override fun getItemCount(): Int {
         return userList.size
     }
-    class userViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        var textName = itemView.findViewById<TextView>(R.id.textName)
-        val profileImage = itemView.findViewById<CircleImageView>(R.id.profile_image)
+    class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        var textName: TextView = itemView.findViewById(R.id.textName)
+        val profileImage: CircleImageView = itemView.findViewById(R.id.profile_image)
     }
 
 }

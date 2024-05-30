@@ -1,40 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".activity.AudioCallActivity"
+    android:keepScreenOn="true">
 
-    <!-- Call status text -->
-    <TextView
-        android:id="@+id/tvCallStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Audio Call"
-        android:textSize="18sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp" />
-
-    <!-- Call controls -->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:gravity="center">
+        android:id="@+id/callLayout"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_height="match_parent">
 
-        <ImageButton
-            android:id="@+id/btnToggleAudio"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_baseline_mic_24"
-            android:background="?android:selectableItemBackground" />
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/remote_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            />
 
-        <ImageButton
-            android:id="@+id/btnEndCall"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_baseline_call_end_24"
-            android:background="?android:selectableItemBackground" />
-    </LinearLayout>
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/local_view"
+            android:layout_width="120dp"
+            android:layout_height="150dp"
+            android:layout_above="@+id/controls"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="16dp"
+            android:visibility="invisible"
+            android:background="@android:color/transparent" />
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/mic_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_baseline_mic_24" />
+
+
+            <ImageView
+                android:id="@+id/end_call_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_baseline_call_end_24" />
+
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+
 </RelativeLayout>
